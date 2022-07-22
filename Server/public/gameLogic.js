@@ -29,8 +29,9 @@ function preload() {
   this.load.tilemapCSV("map", "Assets/tilemaps/csv/testTileMap.csv");
 }
 
+var map;
 function create() {
-  var map = this.make.tilemap({ key: "map" });
+  map = this.make.tilemap({ key: "map" });
   var tileset = map.addTilesetImage("FD_Dungeon_Free", "tileSet");
   var layer = map.createLayer(0, tileset, 0, 0);      
   var player = this.add.image(32 + 16, 32 + 16, "player");
@@ -46,8 +47,14 @@ function create() {
     if (tile.index != ground) {
       //  Blocked, we can't move
       console.log(tile.index);
+
+      if(checkIfPlayerDanger(tile.index, spikes, tile.x, tile.y )){
+      player.x -= 32;
+
+      }
+
     } else {
-      checkIfPlayerDanger(tile.index, spikes);
+      
       player.x -= 32;
     }
   });
@@ -57,11 +64,16 @@ function create() {
     var tile = layer.getTileAtWorldXY(player.x + 32, player.y, true);
 
     if (tile.index != ground) {
-      //  Blocked, we can't move
-      console.log(tile.index);
-    } else {
-      checkIfPlayerDanger(tile.index, spikes);
 
+      //  Blocked, we can't move
+      console.log(tile.x); 
+
+      if(checkIfPlayerDanger(tile.index, spikes,tile.x, tile.y)){
+        player.x += 32;
+      }
+
+
+    } else {
       player.x += 32;
     }
   });
@@ -72,10 +84,12 @@ function create() {
 
     if (tile.index != ground) {
       //  Blocked, we can't move
-      console.log(tile.index);
+
+      if(checkIfPlayerDanger(tile.index, spikes,tile.x, tile.y)){
+        player.y -= 32;
+      }
 
     } else {
-      checkIfPlayerDanger(tile.index, spikes);
 
       player.y -= 32;
     }
@@ -87,22 +101,27 @@ function create() {
 
     if (tile.index != ground) {
       //  Blocked, we can't move
-      console.log(tile.index, spikes);
 
+      if(checkIfPlayerDanger(tile.index, spikes,tile.x, tile.y))
+      {
+        player.y += 32;
+      }
     } else {
-      checkIfPlayerDanger();
-
       player.y += 32;
     }
   });
 }
 
-function checkIfPlayerDanger(tileIndex, spikes) {
-      if (tileIndex === spikes) {
+function checkIfPlayerDanger(tileIndex, spikes,x,y) {
+      if (tileIndex == spikes) {
         //  Do something
-        console.log("Player is in danger!");
+        map.replaceByIndex(tileIndex,-1,x,y,1,1);
+
+        return true;
+
 
       }
+      return false;
 }
 
 
