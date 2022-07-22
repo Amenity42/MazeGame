@@ -1,3 +1,5 @@
+import { checkIfPlayerDanger, checkPlayerAbleToInteract } from "./playerInteractions.js";
+
 var config = {
   type: Phaser.AUTO,
   width: 800,
@@ -23,88 +25,109 @@ function preload() {
     "Assets/FantasyDreamland/32x32/FD_Dungeon_Free.png"
   );
   this.load.spritesheet("player", "Assets/Blue_witch/B_witch_run.png", {
-      frameWidth: 28,
-      frameHeight: 48
-      });
+    frameWidth: 28,
+    frameHeight: 48,
+  });
   this.load.tilemapCSV("map", "Assets/tilemaps/csv/testTileMap.csv");
 }
 
 function create() {
   var map = this.make.tilemap({ key: "map" });
   var tileset = map.addTilesetImage("FD_Dungeon_Free", "tileSet");
-  var layer = map.createLayer(0, tileset, 0, 0);      
+  var layer = map.createLayer(0, tileset, 0, 0);
   var player = this.add.image(32 + 16, 32 + 16, "player");
+
+  console.log(`Player pos X: ${player.x} Player pos X:${player.y}`);
+
+  let playerStartPos = [player.x, player.y];
 
   //*Map tiles
   const ground = -1;
   const spikes = 18;
 
-  //  Left
-  this.input.keyboard.on("keydown-A", function (event) {
-    var tile = layer.getTileAtWorldXY(player.x - 32, player.y, true);
 
-    if (tile.index != ground) {
-      //  Blocked, we can't move
-      console.log(tile.index);
-    } else {
-      checkIfPlayerDanger(tile.index, spikes);
-      player.x -= 32;
-    }
-  });
 
-  //  Right
-  this.input.keyboard.on("keydown-D", function (event) {
-    var tile = layer.getTileAtWorldXY(player.x + 32, player.y, true);
+  
 
-    if (tile.index != ground) {
-      //  Blocked, we can't move
-      console.log(tile.index);
-    } else {
-      checkIfPlayerDanger(tile.index, spikes);
+  //*---------------Player Inputs------------------*
 
-      player.x += 32;
-    }
-  });
+  //*Player movement
 
-  //  Up
-  this.input.keyboard.on("keydown-W", function (event) {
+    //  Up
+    this.input.keyboard.on("keydown-W", keyboard_W);
+  
+    //  Left
+    this.input.keyboard.on("keydown-A", keyboard_A);
+  
+    //  Down
+    this.input.keyboard.on("keydown-S", keyboard_S); 
+    
+    //  Right
+    this.input.keyboard.on("keydown-D", keyboard_D);
+
+  function keyboard_W(event) {
     var tile = layer.getTileAtWorldXY(player.x, player.y - 32, true);
-
     if (tile.index != ground) {
       //  Blocked, we can't move
       console.log(tile.index);
-
+      checkIfPlayerDanger(tile.index, spikes, playerStartPos, player);
     } else {
-      checkIfPlayerDanger(tile.index, spikes);
-
       player.y -= 32;
     }
-  });
+  }
 
-  //  Down
-  this.input.keyboard.on("keydown-S", function (event) {
-    var tile = layer.getTileAtWorldXY(player.x, player.y + 32, true);
-
+  function keyboard_A(event) {
+    var tile = layer.getTileAtWorldXY(player.x - 32, player.y, true);
     if (tile.index != ground) {
       //  Blocked, we can't move
-      console.log(tile.index, spikes);
-
+      console.log(tile.index);
+      //console.log(event);
+      checkIfPlayerDanger(tile.index, spikes, playerStartPos, player);
     } else {
-      checkIfPlayerDanger();
+      player.x -= 32;
+    }
+  }
 
+  function keyboard_S(event) {
+    var tile = layer.getTileAtWorldXY(player.x, player.y + 32, true);
+    if (tile.index != ground) {
+      //  Blocked, we can't move
+      console.log(tile.index);
+      checkIfPlayerDanger(tile.index, spikes, playerStartPos, player);
+    } else {
       player.y += 32;
     }
-  });
+  }
+
+  function keyboard_D(event) {
+    var tile = layer.getTileAtWorldXY(player.x + 32, player.y, true);
+    if (tile.index != ground) {
+      //  Blocked, we can't move
+      console.log(tile.index);
+      console.log('test' + tile.index);
+      checkIfPlayerDanger(tile.index, spikes, playerStartPos, player);
+    } else {
+      player.x += 32;
+    }
+  }
+
+  function keyboard_E(event) {
+    var tile = layer.getTileAtWorldXY(player.x - 32, player.y, true);
+    if (tile.index != ground) {
+      //  Blocked, we can't move
+      console.log(tile.index);
+    } else {
+      player.x -= 32;
+    }
+  }
+
+  //Mouse Inputs
+  this.input.on('pointerdown', (mousePointer) => {console.log(layer.getTileAtWorldXY(mousePointer.x, mousePointer.y, true))});
+  this.input.on('pointerdown', (mousePointer) => {console.log(layer.getTileAtWorldXY(mousePointer.x, mousePointer.y, true))});
+
+  console.log(this);
+  
+
 }
-
-function checkIfPlayerDanger(tileIndex, spikes) {
-      if (tileIndex === spikes) {
-        //  Do something
-        console.log("Player is in danger!");
-
-      }
-}
-
-
 
 
