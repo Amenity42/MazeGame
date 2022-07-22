@@ -1,9 +1,9 @@
-import { checkIfPlayerDanger, checkPlayerAbleToInteract } from "./playerInteractions.js";
+import { checkIfPlayerDanger, checkPlayerAbleToInteract, pressButton } from "./playerInteractions.js";
 
 var config = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
+  width: 950,
+  height: 650,
   physics: {
     default: "arcade",
     arcade: {
@@ -42,12 +42,11 @@ function create() {
   let playerStartPos = [player.x, player.y];
 
   //*Map tiles
-  const ground = -1;
-  const spikes = 18;
+  const ground1 = 105 //*Ground tile;
+  const ground2 = 106 //*Ground tile;
+  const spikes = 19;
+  const blackSpikes = 17;
 
-
-
-  
 
   //*---------------Player Inputs------------------*
 
@@ -67,10 +66,10 @@ function create() {
 
   function keyboard_W(event) {
     var tile = layer.getTileAtWorldXY(player.x, player.y - 32, true);
-    if (tile.index != ground) {
+    if (tile.index != ground1) {
       //  Blocked, we can't move
       console.log(tile.index);
-      checkIfPlayerDanger(tile.index, spikes, playerStartPos, player);
+      checkIfPlayerDanger(tile.index, spikes, blackSpikes, playerStartPos, player);
     } else {
       player.y -= 32;
     }
@@ -78,11 +77,11 @@ function create() {
 
   function keyboard_A(event) {
     var tile = layer.getTileAtWorldXY(player.x - 32, player.y, true);
-    if (tile.index != ground) {
+    if (tile.index != ground1) {
       //  Blocked, we can't move
       console.log(tile.index);
       //console.log(event);
-      checkIfPlayerDanger(tile.index, spikes, playerStartPos, player);
+      checkIfPlayerDanger(tile.index, spikes, blackSpikes, playerStartPos, player);
     } else {
       player.x -= 32;
     }
@@ -90,10 +89,10 @@ function create() {
 
   function keyboard_S(event) {
     var tile = layer.getTileAtWorldXY(player.x, player.y + 32, true);
-    if (tile.index != ground) {
+    if (tile.index != ground1) {
       //  Blocked, we can't move
       console.log(tile.index);
-      checkIfPlayerDanger(tile.index, spikes, playerStartPos, player);
+      checkIfPlayerDanger(tile.index, spikes, blackSpikes, playerStartPos, player);
     } else {
       player.y += 32;
     }
@@ -101,33 +100,37 @@ function create() {
 
   function keyboard_D(event) {
     var tile = layer.getTileAtWorldXY(player.x + 32, player.y, true);
-    if (tile.index != ground) {
+    if (tile.index != ground1) {
       //  Blocked, we can't move
       console.log(tile.index);
       console.log('test' + tile.index);
-      checkIfPlayerDanger(tile.index, spikes, playerStartPos, player);
+      checkIfPlayerDanger(tile.index, spikes, blackSpikes, playerStartPos, player);
+
+      if(tile.index === -1610512652){
+        alert('You have reached the end of the level!');
+      }
     } else {
       player.x += 32;
+      console.log(`player pos X: ${player.x} Player pos Y:${player.y}`);
     }
   }
 
-  function keyboard_E(event) {
-    var tile = layer.getTileAtWorldXY(player.x - 32, player.y, true);
-    if (tile.index != ground) {
-      //  Blocked, we can't move
-      console.log(tile.index);
-    } else {
-      player.x -= 32;
-    }
-  }
+  // 
 
   //Mouse Inputs
   this.input.on('pointerdown', (mousePointer) => {console.log(layer.getTileAtWorldXY(mousePointer.x, mousePointer.y, true))});
-  this.input.on('pointerdown', (mousePointer) => {console.log(layer.getTileAtWorldXY(mousePointer.x, mousePointer.y, true))});
+  this.input.on('pointerdown', (mousePointer) => { 
+   if(checkPlayerAbleToInteract(player, layer.getTileAtWorldXY(mousePointer.x, mousePointer.y, true), map)){
+    //console.log('interact');
+    let tile = layer.getTileAtWorldXY(mousePointer.x, mousePointer.y, true);
+    pressButton(tile, map);  //*Interact with tile
+   }
+   else{
+    console.log('cannot interact');
+   }
 
-  console.log(this);
+   });
   
-
 }
 
 
